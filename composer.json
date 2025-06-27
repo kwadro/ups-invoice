@@ -16,7 +16,8 @@
         "laminas/laminas-skeleton-installer": "^0.6",
         "laminas/laminas-mvc": "^3.1.1",
         "ext-curl": "*",
-        "smalot/pdfparser": "^2.12"
+        "smalot/pdfparser": "^2.12",
+        "cweagans/composer-patches": "^1.7"
     },
     "autoload": {
         "psr-4": {
@@ -56,7 +57,16 @@
     "config": {
         "allow-plugins": {
             "laminas/laminas-component-installer": true,
-            "laminas/laminas-skeleton-installer": true
+            "laminas/laminas-skeleton-installer": true,
+            "cweagans/composer-patches": true
+        }
+    },
+    "extra": {
+        "composer-exit-on-patch-failure": true,
+        "patches": {
+            "smalot/pdfparser": {
+                "Fixed parse error": "composer-patches/Fixed_Parse_Page_Error.diff"
+            }
         }
     }
 }
