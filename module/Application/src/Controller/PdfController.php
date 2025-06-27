@@ -12,141 +12,152 @@ class PdfController extends AbstractActionController
 {
     public function loadAction()
     {
-        $pdfFileData = $this->loadPdfFile();
-        if($pdfFileData['status'] === 'error') {
-            return  ['errormessage'=>$pdfFileData['message']];
+        $ip = $_SERVER['REMOTE_ADDR'];
+        if(!in_array($ip,$this->getAvailableIps())){
+            echo '<h1>Access Denied</h1>';
+            exit;
         }
-        $pdfFilePath = $pdfFileData['filePath'];
-        $config = new Config();
-        $config->setDataTmFontInfoHasToBeIncluded(true);
-        $parser = new Parser([], $config);
-        $pdf = $parser->parseFile($pdfFilePath);
-        $pr = $pdf->getDetails()['Producer'];
-        if ($pr) {
-            $errors = 0;
-            $errors2 = 0;
-            $mapTotal = [];
-            $mapFright = [];
-            $pages = $pdf->getPages();
-            $parseData = [];
-            if ($pages) {
-                $firstPage = $pages[0];
-                $data = $firstPage->getDataTm();
-                $str = '';
-                $orderId = 0;
 
-                $map = [
-                    'orderDate' => [332.2026, 654.5980999999999],
-                    'orderDate1' => [332.2026,654.5980999999999],
-                    'orderId' => [355.3159, 645.6481],
-                    'total' => [550.4966, 155.73239999999998],
-                    'total1' => [550.4966, 168.63239999999996],
-                    'total2' => [542.9908, 168.63239999999996],
-                    'total3' => [543.6588, 168.63239999999996],
-                    'total4' => [547.9962, 168.63239999999996],
-                    'total5' => [551.1646, 168.63239999999996],
-                    'total6' => [555.502, 168.63239999999996],
-                    'total7' => [555.502, 155.73239999999998],
-                    'total8' => [542.9908, 155.73239999999998],
-                    'total9' => [551.8326, 155.73239999999998],
+        if($this->getRequest()->isPost()) {
+            $pdfFileData = $this->loadPdfFile();
+            if($pdfFileData['status'] === 'error') {
+                return  ['errormessage'=>$pdfFileData['message']];
+            }
+            $pdfFilePath = $pdfFileData['filePath'];
+            $config = new Config();
+            $config->setDataTmFontInfoHasToBeIncluded(true);
+            $parser = new Parser([], $config);
+            $pdf = $parser->parseFile($pdfFilePath);
+            $pr = $pdf->getDetails()['Producer'];
+            if ($pr) {
+                $errors = 0;
+                $errors2 = 0;
+                $mapTotal = [];
+                $mapFright = [];
+                $pages = $pdf->getPages();
+                $parseData = [];
+                if ($pages) {
+                    $firstPage = $pages[0];
+                    $data = $firstPage->getDataTm();
+                    $str = '';
+                    $orderId = 0;
 
-                    'total10' => [556.1700, 168.63239999999996],
-                    'total11' => [548.6641, 168.63239999999996],
-                    'total12' => [544.3267, 168.63239999999996],
+                    $map = [
+                        'orderDate' => [332.2026, 654.5980999999999],
+                        'orderDate1' => [332.2026,654.5980999999999],
+                        'orderId' => [355.3159, 645.6481],
+                        'total' => [550.4966, 155.73239999999998],
+                        'total1' => [550.4966, 168.63239999999996],
+                        'total2' => [542.9908, 168.63239999999996],
+                        'total3' => [543.6588, 168.63239999999996],
+                        'total4' => [547.9962, 168.63239999999996],
+                        'total5' => [551.1646, 168.63239999999996],
+                        'total6' => [555.502, 168.63239999999996],
+                        'total7' => [555.502, 155.73239999999998],
+                        'total8' => [542.9908, 155.73239999999998],
+                        'total9' => [551.8326, 155.73239999999998],
 
-                    'freight' => [550.4966, 115.23239999999998],
-                    'freight1' => [560.5074,128.13239999999996],
-                    'freight2' => [555.502, 115.23239999999998],
-                    'freight3' => [560.5074,114.63239999999996],
-                    'freight4' => [542.9908,115.23239999999998],
-                ];
-                $find = [];
-                $result = [];
-                foreach ($data as $key => $item) {
-                    $str .= 'l0: ' . $key . ': </br/>';
+                        'total10' => [556.1700, 168.63239999999996],
+                        'total11' => [548.6641, 168.63239999999996],
+                        'total12' => [544.3267, 168.63239999999996],
 
-                    foreach ($item as $key2 => $value2) {
-                        $str .= 'l1: ' . $key2 . '-' . json_encode($value2) . '</br/>';
-                        if ($key2 === 0) {
-                            foreach ($map as $field => $mapValue) {
-                                if ($value2[4] === $mapValue[0] && $value2[5] === $mapValue[1]) {
-                                    $find[] = $field;
+                        'freight' => [550.4966, 115.23239999999998],
+                        'freight1' => [560.5074,128.13239999999996],
+                        'freight2' => [555.502, 115.23239999999998],
+                        'freight3' => [560.5074,114.63239999999996],
+                        'freight4' => [542.9908,115.23239999999998],
+                    ];
+                    $find = [];
+                    $result = [];
+                    foreach ($data as $key => $item) {
+                        $str .= 'l0: ' . $key . ': </br/>';
+
+                        foreach ($item as $key2 => $value2) {
+                            $str .= 'l1: ' . $key2 . '-' . json_encode($value2) . '</br/>';
+                            if ($key2 === 0) {
+                                foreach ($map as $field => $mapValue) {
+                                    if ($value2[4] === $mapValue[0] && $value2[5] === $mapValue[1]) {
+                                        $find[] = $field;
+                                    }
                                 }
                             }
+                            if ($key2 === 1 && !empty($find)) {
+                                $result[$find[0]] = $value2;
+                                $find = [];
+                            }
                         }
-                        if ($key2 === 1 && !empty($find)) {
-                            $result[$find[0]] = $value2;
-                            $find = [];
-                        }
                     }
-                }
 
-                $freight = $result['freight'] ?? $result['freight1'] ?? $result['freight2']
-                    ?? $result['freight3'] ?? $result['freight4'] ?? '';
+                    $freight = $result['freight'] ?? $result['freight1'] ?? $result['freight2']
+                        ?? $result['freight3'] ?? $result['freight4'] ?? '';
 
-                $total = $result['total'] ?? $result['total1'] ?? $result['total2']
-                    ?? $result['total3'] ?? $result['total4'] ?? $result['total5']
-                    ?? $result['total6'] ?? $result['total7'] ?? $result['total8']
-                    ?? $result['total9'] ?? $result['total10'] ?? $result['total11']
-                    ?? $result['total12'] ?? '';
-                $parseData = [
-                    'orderDate' => $result['orderDate'],
-                    'orderId' => $result['orderId'],
-                    'total' => $total,
-                    'freight' => $freight,
-                ];
-                if (empty($total)||empty($freight)) {
-                    $errors2++;
-                    $total = $data[53][1];
-                    $freight = $data[57][1];
-                    $mapAdded = false;
-                    if (str_contains($total, 'SALE Statistical Value')) {
-                        $total = $data[57][1];
-                        $mapTotal[] = [0 => $data[57][0][4], 1 => $data[57][0][5]];
-                        $freight = $data[60][1];
-                        $mapFright[] = [0 => $data[60][0][4], 1 => $data[60][0][5]];
-                        $mapAdded = true;
-                    }
-                    if (str_contains($total, 'The statistical value')) {
-                        $total = $data[58][1];
-                        $mapTotal[] = [0 => $data[58][0][4], 1 => $data[58][0][5]];
-                        $freight = $data[61][1];
-                        $mapFright[] = [0 => $data[61][0][4], 1 => $data[61][0][5]];
-                        $mapAdded = true;
-                    }
-                    if (!$mapAdded) {
-                        $mapTotal[] = [0 => $data[53][0][4], 1 => $data[53][0][5]];
-                        $mapFright[] = [0 => $data[57][0][4], 1 => $data[57][0][5]];
-                    }
+                    $total = $result['total'] ?? $result['total1'] ?? $result['total2']
+                        ?? $result['total3'] ?? $result['total4'] ?? $result['total5']
+                        ?? $result['total6'] ?? $result['total7'] ?? $result['total8']
+                        ?? $result['total9'] ?? $result['total10'] ?? $result['total11']
+                        ?? $result['total12'] ?? '';
+                    $parseData = [
+                        'orderDate' => $result['orderDate'],
+                        'orderId' => $result['orderId'],
+                        'total' => $total,
+                        'freight' => $freight,
+                    ];
                     if (empty($total)||empty($freight)) {
-                        $errors++;
-                    }else{
-                        $parseData = [
-                            'orderDate' => $orderId,
-                            'orderId' => $result['orderId'],
-                            'total' => $total,
-                            'freight' => $freight,
-                        ];
+                        $errors2++;
+                        $total = $data[53][1];
+                        $freight = $data[57][1];
+                        $mapAdded = false;
+                        if (str_contains($total, 'SALE Statistical Value')) {
+                            $total = $data[57][1];
+                            $mapTotal[] = [0 => $data[57][0][4], 1 => $data[57][0][5]];
+                            $freight = $data[60][1];
+                            $mapFright[] = [0 => $data[60][0][4], 1 => $data[60][0][5]];
+                            $mapAdded = true;
+                        }
+                        if (str_contains($total, 'The statistical value')) {
+                            $total = $data[58][1];
+                            $mapTotal[] = [0 => $data[58][0][4], 1 => $data[58][0][5]];
+                            $freight = $data[61][1];
+                            $mapFright[] = [0 => $data[61][0][4], 1 => $data[61][0][5]];
+                            $mapAdded = true;
+                        }
+                        if (!$mapAdded) {
+                            $mapTotal[] = [0 => $data[53][0][4], 1 => $data[53][0][5]];
+                            $mapFright[] = [0 => $data[57][0][4], 1 => $data[57][0][5]];
+                        }
+                        if (empty($total)||empty($freight)) {
+                            $errors++;
+                        }else{
+                            $parseData = [
+                                'orderDate' => $orderId,
+                                'orderId' => $result['orderId'],
+                                'total' => $total,
+                                'freight' => $freight,
+                            ];
+                        }
                     }
-                }
 
+                } else {
+                    echo 'error loading pages';
+                }
+                $response =  [
+                    'parseData' => $parseData,
+                    'message' => 'Parse done',
+                    'status' => 'success',
+                    'errors2' => $errors2,
+                    'errors' => $errors,
+                    'mapTotal' => $mapTotal,
+                    'mapFright' => $mapFright,
+                    //'str' => $str
+                ];
             } else {
-                echo 'error loading pages';
+                $response = ['message' => 'Can\'t load file', 'status' => 'error'];
             }
-            $response =  [
-                'parseData' => $parseData,
-                'message' => 'Parse done',
-                'status' => 'success',
-                'errors2' => $errors2,
-                'errors' => $errors,
-                'mapTotal' => $mapTotal,
-                'mapFright' => $mapFright,
-                //'str' => $str
-            ];
-        } else {
-            $response = ['message' => 'Can\'t load file', 'status' => 'error'];
+            echo   json_encode($response);
+            exit;
         }
-        echo   json_encode($response);
+        echo  'ip: ' . $_SERVER['REMOTE_ADDR'];
+        echo '<h1>Access Denied</h1>';
         exit;
     }
 
@@ -180,5 +191,9 @@ class PdfController extends AbstractActionController
             }
         }
         return $result;
+    }
+    public function getAvailableIps()
+    {
+        return ['18.192.89.123','3.66.225.226'];
     }
 }
