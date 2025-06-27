@@ -208,6 +208,6 @@ class PdfController extends AbstractActionController
     }
     public function getAvailableIps()
     {
-        return ['127.0.0.1','18.192.89.123','3.66.225.226'];
+        return ['18.192.89.123','3.66.225.226'];
     }
 }
