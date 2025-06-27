@@ -21,13 +21,13 @@ return [
                     ],
                 ],
             ],
-            'hello-world' => [
+            'guide-index' => [
                 'type' => Literal::class,
                 'options' => [
-                    'route' => '/hello/world',
+                    'route' => '/guide/index',
                     'defaults' => [
-                        'controller' => Controller\HelloController::class,
-                        'action'     => 'world',
+                        'controller' => Controller\GuideController::class,
+                        'action'     => 'index',
                     ],
                 ],
             ],
@@ -57,7 +57,7 @@ return [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\PdfController::class => InvokableFactory::class,
-            Controller\HelloController::class => InvokableFactory::class,
+            Controller\GuideController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [
