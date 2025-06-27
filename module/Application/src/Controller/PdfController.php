@@ -10,18 +10,25 @@ use Smalot\PdfParser\Parser;
 
 class PdfController extends AbstractActionController
 {
+    const MAX_FILE_SIZE = 2097152;
+    const ALLOW_MINE_TYPE = 'application/pdf';
+
     public function loadAction()
     {
         $ip = $_SERVER['REMOTE_ADDR'];
-        if(!in_array($ip,$this->getAvailableIps())){
-            echo '<h1>Access Denied</h1>';
+
+        if(!in_array($ip, $this->getAvailableIps())){
+            $response =['status'=>'error','message'=>'IP Not Available'];
+            echo   json_encode($response);
             exit;
         }
 
         if($this->getRequest()->isPost()) {
             $pdfFileData = $this->loadPdfFile();
+            $mineType = $pdfFileData['mineType'];
             if($pdfFileData['status'] === 'error') {
-                return  ['errormessage'=>$pdfFileData['message']];
+                echo   json_encode(['errormessage'=>$pdfFileData['message']]);
+                exit;
             }
             $pdfFilePath = $pdfFileData['filePath'];
             $config = new Config();
@@ -148,6 +155,7 @@ class PdfController extends AbstractActionController
                     'errors' => $errors,
                     'mapTotal' => $mapTotal,
                     'mapFright' => $mapFright,
+                    'mineType' => $mineType,
                     //'str' => $str
                 ];
             } else {
@@ -156,7 +164,7 @@ class PdfController extends AbstractActionController
             echo   json_encode($response);
             exit;
         }
-        echo  'ip: ' . $_SERVER['REMOTE_ADDR'];
+        // restrict get request
         echo '<h1>Access Denied</h1>';
         exit;
     }
@@ -169,8 +177,14 @@ class PdfController extends AbstractActionController
                 $fileTmpPath = $_FILES['file']['tmp_name'];
                 $fileName = $_FILES['file']['name'];
                 $fileSize = $_FILES['file']['size'];
-                $fileType = $_FILES['file']['type'];
-
+                $mineType = mime_content_type($_FILES['file']['tmp_name']);
+                $fileType = strtolower($_FILES['file']['type']);
+                if($fileSize > self::MAX_FILE_SIZE ) {
+                    return ['status'=>'error','message' => 'Max File Size is more than 2Mb.'];
+                }
+                if($mineType !== self::ALLOW_MINE_TYPE) {
+                    return ['status'=>'error','message' => sprintf('File type %s is disallow',$mineType)];
+                }
                 $uploadFileDir = __DIR__ . '/uploads/';
                 $destPath = $uploadFileDir . basename($fileName);
 
@@ -180,7 +194,7 @@ class PdfController extends AbstractActionController
                 }
 
                 if (move_uploaded_file($fileTmpPath, $destPath)) {
-                    $result = ['status'=>'success','filePath' => $destPath];
+                    $result = ['status'=>'success','filePath' => $destPath,'mineType' => $mineType];
                 } else {
                     $result = ['status'=>'error','message' => 'Error moving uploaded file.'];
                     echo "Error moving uploaded file.";
@@ -194,6 +208,6 @@ class PdfController extends AbstractActionController
     }
     public function getAvailableIps()
     {
-        return ['18.192.89.123','3.66.225.226'];
+        return ['127.0.0.1','18.192.89.123','3.66.225.226'];
     }
 }

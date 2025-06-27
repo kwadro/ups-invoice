@@ -31,6 +31,16 @@ return [
                     ],
                 ],
             ],
+            'hello-world' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/hello/world',
+                    'defaults' => [
+                        'controller' => Controller\HelloController::class,
+                        'action'     => 'world',
+                    ],
+                ],
+            ],
             'pdf-load' => [
                 'type' => Literal::class,
                 'options' => [
@@ -58,6 +68,7 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\PdfController::class => InvokableFactory::class,
             Controller\GuideController::class => InvokableFactory::class,
+            Controller\HelloController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [

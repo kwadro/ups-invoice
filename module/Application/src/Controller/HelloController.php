@@ -11,10 +11,13 @@ use RecursiveIteratorIterator;
 
 class HelloController extends AbstractActionController
 {
-    public const API_ENDPOINT_URL = 'https://www.kwadro.com.ua/pdf/load';
-
+    public const API_ENDPOINT_URL = 'https://printsafari.loc/pdf/load';
+    // use only for local testing
     public function worldAction(): ViewModel
     {
+        echo '<h1>Access Denied</h1>';
+        exit;
+
         $files = $this->loadFiles('/CA');
         echo 'API_ENDPOINT_URL: ' . self::API_ENDPOINT_URL . '<br/>';
         echo 'count files: ' . count($files) . '<br/>';
@@ -54,6 +57,7 @@ class HelloController extends AbstractActionController
             echo 'errors2: ' . $errors2 . '<br/>';
             echo 'errors: ' . $errors . '<br/>';
             echo $html . '<br/>';
+            exit;
         }
         exit;
     }
@@ -81,6 +85,7 @@ class HelloController extends AbstractActionController
         if (curl_errno($ch)) {
             $res = ['message' => 'cURL error: ' . curl_error($ch), 'status' => 'error'];
         } else {
+
             $res = json_decode($response, true);
         }
         curl_close($ch);
