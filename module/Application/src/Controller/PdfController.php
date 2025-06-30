@@ -50,29 +50,34 @@ class PdfController extends AbstractActionController
                     $orderId = 0;
 
                     $map = [
-                        'orderDate' => [332.2026, 654.5980999999999],
-                        'orderDate1' => [332.2026,654.5980999999999],
+                        'orderDate' => [
+                            [332.2026, 654.5980999999999],
+                            [332.2026, 654.5980999999999]
+                        ],
                         'orderId' => [355.3159, 645.6481],
-                        'total' => [550.4966, 155.73239999999998],
-                        'total1' => [550.4966, 168.63239999999996],
-                        'total2' => [542.9908, 168.63239999999996],
-                        'total3' => [543.6588, 168.63239999999996],
-                        'total4' => [547.9962, 168.63239999999996],
-                        'total5' => [551.1646, 168.63239999999996],
-                        'total6' => [555.502, 168.63239999999996],
-                        'total7' => [555.502, 155.73239999999998],
-                        'total8' => [542.9908, 155.73239999999998],
-                        'total9' => [551.8326, 155.73239999999998],
-
-                        'total10' => [556.1700, 168.63239999999996],
-                        'total11' => [548.6641, 168.63239999999996],
-                        'total12' => [544.3267, 168.63239999999996],
-
-                        'freight' => [550.4966, 115.23239999999998],
-                        'freight1' => [560.5074,128.13239999999996],
-                        'freight2' => [555.502, 115.23239999999998],
-                        'freight3' => [560.5074,114.63239999999996],
-                        'freight4' => [542.9908,115.23239999999998],
+                        'total' => [
+                            [550.4966, 155.73239999999998],
+                            [550.4966, 168.63239999999996],
+                            [542.9908, 168.63239999999996],
+                            [543.6588, 168.63239999999996],
+                            [547.9962, 168.63239999999996],
+                            [551.1646, 168.63239999999996],
+                            [555.502, 168.63239999999996],
+                            [555.502, 155.73239999999998],
+                            [542.9908, 155.73239999999998],
+                            [551.8326, 155.73239999999998],
+                            [556.1700, 168.63239999999996],
+                            [548.6641, 168.63239999999996],
+                            [544.3267, 168.63239999999996],
+                        ],
+                        'freight' => [
+                            [550.4966, 115.23239999999998],
+                            [560.5074,128.13239999999996],
+                            [555.502 ,115.23239999999998],
+                            [560.5074,114.63239999999996],
+                            [542.9908,115.23239999999998],
+                            [555.502 ,128.13239999999996]
+                        ],
                     ];
                     $find = [];
                     $result = [];
@@ -82,38 +87,42 @@ class PdfController extends AbstractActionController
                         foreach ($item as $key2 => $value2) {
                             $str .= 'l1: ' . $key2 . '-' . json_encode($value2) . '</br/>';
                             if ($key2 === 0) {
-                                foreach ($map as $field => $mapValue) {
-                                    if ($value2[4] === $mapValue[0] && $value2[5] === $mapValue[1]) {
-                                        $find[] = $field;
+                                foreach ($map as $field => $mapValues) {
+                                    foreach ($mapValues as $mapValue) {
+                                        if ($value2[4] === $mapValue[0] && $value2[5] === $mapValue[1]) {
+                                            $find[] = $field;
+                                        }
                                     }
                                 }
                             }
-                            if ($key2 === 1 && !empty($find)) {
-                                $result[$find[0]] = $value2;
+                            if ($key2 === 1 && !empty($find) ) {
+                                if(!isset($result[$find[0]])){
+                                    $result[$find[0]] = $value2;
+                                }else{
+                                    if($value2 > $result[$find[0]] ){
+                                        $result[$find[0]] = $value2;
+                                    }
+                                }
                                 $find = [];
                             }
                         }
                     }
 
-                    $freight = $result['freight'] ?? $result['freight1'] ?? $result['freight2']
-                        ?? $result['freight3'] ?? $result['freight4'] ?? '';
+                    $freight = $result['freight'] ?? '';
 
-                    $total = $result['total'] ?? $result['total1'] ?? $result['total2']
-                        ?? $result['total3'] ?? $result['total4'] ?? $result['total5']
-                        ?? $result['total6'] ?? $result['total7'] ?? $result['total8']
-                        ?? $result['total9'] ?? $result['total10'] ?? $result['total11']
-                        ?? $result['total12'] ?? '';
+                    $total = $result['total'] ?? '';
                     $parseData = [
                         'orderDate' => $result['orderDate'],
                         'orderId' => $result['orderId'],
                         'total' => $total,
                         'freight' => $freight,
                     ];
-                    if (empty($total)||empty($freight)) {
+                    if (empty($total) ||empty($freight)|| $freight==='0.00') {
                         $errors2++;
                         $total = $data[53][1];
                         $freight = $data[57][1];
                         $mapAdded = false;
+
                         if (str_contains($total, 'SALE Statistical Value')) {
                             $total = $data[57][1];
                             $mapTotal[] = [0 => $data[57][0][4], 1 => $data[57][0][5]];
@@ -208,6 +217,6 @@ class PdfController extends AbstractActionController
     }
     public function getAvailableIps()
     {
-        return ['18.192.89.123','3.66.225.226'];
+        return ['127.0.0.1','18.192.89.123','3.66.225.226'];
     }
 }

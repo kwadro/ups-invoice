@@ -26,7 +26,9 @@ class HelloController extends AbstractActionController
         $errors = 0;
         foreach ($files as $file) {
             echo 'file: ' . $file . '<br/>';
+            $file = '/home/igor/home/pdftest/comercialinvoices/US025517_1_1_ComInv_p1.PDF';
             $response = $this->getCurlRequest($file);
+
             if ($response['status'] == 'success') {
                 if ($response['errors2'] > 0) {
                     $errors2++;
@@ -43,7 +45,7 @@ class HelloController extends AbstractActionController
                         }
                     }
                 }
-                if ($response['errors2'] == 0 && $response['errors'] == 0) {
+                if ($response['errors2'] >= 0 && $response['errors'] == 0) {
                     $parseResponse='';
                     foreach ($response['parseData'] as $key => $value) {
                         $parseResponse .= $key . ': ' . $value . '<br>';
