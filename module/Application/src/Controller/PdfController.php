@@ -76,7 +76,8 @@ class PdfController extends AbstractActionController
                             [555.502 ,115.23239999999998],
                             [560.5074,114.63239999999996],
                             [542.9908,115.23239999999998],
-                            [555.502 ,128.13239999999996]
+                            [555.502 ,128.13239999999996],
+                            [550.4966,128.13239999999996]
                         ],
                     ];
                     $find = [];
@@ -165,7 +166,7 @@ class PdfController extends AbstractActionController
                     'mapTotal' => $mapTotal,
                     'mapFright' => $mapFright,
                     'mineType' => $mineType,
-                    //'str' => $str
+                    'str' => $str
                 ];
             } else {
                 $response = ['message' => 'Can\'t load file', 'status' => 'error'];
