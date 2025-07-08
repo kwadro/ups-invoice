@@ -12,7 +12,7 @@ class PdfController extends AbstractActionController
 {
     const MAX_FILE_SIZE = 2097152;
     const ALLOW_MINE_TYPE = 'application/pdf';
-    const TEST_MODE = false;
+    const TEST_MODE = true;
 
     public function loadAction()
     {
@@ -74,7 +74,7 @@ class PdfController extends AbstractActionController
                             [555.502, 115.23239999999998],
                             [560.5074, 114.63239999999996],
                             [542.9908, 115.23239999999998],
-                            [542.9908, 128.73239999999998],
+                            [547.9962,115.23239999999998],
                             [555.502, 128.13239999999996],
                             [550.4966, 128.13239999999996]
                         ],
